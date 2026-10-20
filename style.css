@@ -1,31 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Color Palette - Minimalist Enterprise Editorial Light Theme */
-  --bg-main: #f8fafc; /* Very light cool slate grey */
-  --bg-card: #ffffff; /* Pure white */
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
   --bg-card-hover: #ffffff;
   --border-glow: rgba(15, 23, 42, 0.08);
   --border-subtle: rgba(15, 23, 42, 0.06);
-  
-  --text-primary: #0f172a; /* Slate 900 */
-  --text-secondary: #475569; /* Slate 600 */
-  --text-muted: #94a3b8; /* Slate 400 */
-  
-  /* Accent Colors */
-  --color-primary: #0f172a; /* Midnight Slate */
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --color-primary: #0f172a;
   --color-primary-glow: rgba(15, 23, 42, 0.06);
   --color-primary-dark: #1e293b;
-  
-  /* Security Risk Scales - Elegant Corporate Editorial */
-  --risk-high-base: 0, 75%, 40%; /* Deep Burgundy Crimson */
-  --risk-medium-base: 28, 80%, 45%; /* Warm Terracotta / Ochre */
-  --risk-low-base: 150, 60%, 35%; /* Forest Sage Green */
-  
+
+  --risk-high-base: 0, 75%, 40%;
+  --risk-medium-base: 28, 80%, 45%;
+  --risk-low-base: 150, 60%, 35%;
+
   --risk-high: hsl(var(--risk-high-base));
   --risk-medium: hsl(var(--risk-medium-base));
   --risk-low: hsl(var(--risk-low-base));
-  
+
   --risk-high-bg: hsla(var(--risk-high-base), 0.06);
   --risk-medium-bg: hsla(var(--risk-medium-base), 0.06);
   --risk-low-bg: hsla(var(--risk-low-base), 0.06);
@@ -38,17 +35,14 @@
   --risk-medium-glow: rgba(194, 65, 12, 0.05);
   --risk-low-glow: rgba(6, 95, 70, 0.05);
 
-  /* Typography */
   --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  
-  /* Shadow & Blur */
+
   --glass-shadow: 0 4px 20px 0 rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03);
   --glass-blur: 0px;
   --transition-smooth: all 0.25s ease-out;
 }
 
-/* Base Reset */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -57,7 +51,7 @@
 
 body {
   background-color: var(--bg-main);
-  background-image: 
+  background-image:
     radial-gradient(at 10% 10%, rgba(15, 23, 42, 0.02) 0px, transparent 50%),
     radial-gradient(at 90% 90%, rgba(15, 23, 42, 0.01) 0px, transparent 50%),
     radial-gradient(at 50% 50%, rgba(248, 250, 252, 0.8) 0px, transparent 100%);
@@ -70,7 +64,6 @@ body {
   overflow-x: hidden;
 }
 
-/* App Layout */
 .app-container {
   max-width: 1280px;
   margin: 0 auto;
@@ -81,7 +74,6 @@ body {
   position: relative;
 }
 
-/* Header UI */
 .app-header {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -127,7 +119,6 @@ body {
   line-height: 1.5;
 }
 
-/* Main Dashboard Grid */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -147,7 +138,6 @@ body {
   }
 }
 
-/* Glassmorphism Panels */
 .glass-panel {
   background: var(--bg-card);
   backdrop-filter: blur(var(--glass-blur));
@@ -174,7 +164,6 @@ body {
   gap: 0.75rem;
 }
 
-/* Form Styles */
 .analysis-form {
   display: flex;
   flex-direction: column;
@@ -253,7 +242,6 @@ body {
   background: #ffffff;
 }
 
-/* Character Counter */
 .char-counter-wrapper {
   display: flex;
   align-items: center;
@@ -345,6 +333,8 @@ body {
   color: #ffffff;
   transform: translateY(-1px);
 }
+
+.example-tag {
   border-color: rgba(15, 23, 42, 0.15);
   color: var(--text-primary);
 }
@@ -381,7 +371,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Results / Empty States */
 .results-container {
   display: flex;
   flex-direction: column;
@@ -437,7 +426,6 @@ body {
   line-height: 1.5;
 }
 
-/* Loader Styles */
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -495,10 +483,15 @@ body {
 .loading-dots span {
   animation: blinkDots 1.4s infinite both;
 }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
 
-/* Dashboard Header Results */
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
 .result-header-panel {
   display: grid;
   grid-template-columns: 1fr;
@@ -597,7 +590,6 @@ body {
   line-height: 1.6;
 }
 
-/* Indicators and Threats */
 .findings-section {
   display: flex;
   flex-direction: column;
@@ -651,7 +643,6 @@ body {
   color: var(--text-primary);
 }
 
-/* Technical Details Accordion */
 .tech-details-container {
   border-radius: 0.75rem;
   background: #f8fafc;
@@ -713,21 +704,20 @@ body {
   align-items: flex-start;
 }
 
-/* Color-coded console log lines */
 .tech-log-line.log-intel {
-  color: #67e8f9; /* Cyan for urlscan.io intel */
+  color: #67e8f9;
 }
 
 .tech-log-line.log-alert {
-  color: #fbbf24; /* Yellow/amber for alerts */
+  color: #fbbf24;
 }
 
 .tech-log-line.log-safe {
-  color: #86efac; /* Bright green for trusted domain */
+  color: #86efac;
 }
 
 .tech-log-line.log-header {
-  color: #c4b5fd; /* Purple for header / unicode analysis */
+  color: #c4b5fd;
 }
 
 .tech-prompt-symbol {
@@ -735,7 +725,6 @@ body {
   user-select: none;
 }
 
-/* Action Recommendations Cards */
 .recommendations-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -778,7 +767,6 @@ body {
   color: var(--text-secondary);
 }
 
-/* Dynamic colors based on risk state */
 .risk-high-style {
   color: var(--risk-high);
   background: var(--risk-high-bg);
@@ -800,7 +788,6 @@ body {
   box-shadow: 0 0 15px var(--risk-low-glow);
 }
 
-/* Export Button */
 .export-btn {
   display: inline-flex;
   align-items: center;
@@ -830,7 +817,6 @@ body {
   transform: translateY(0);
 }
 
-/* ─── History Panel ─────────────────────────────────── */
 .history-panel {
   animation: fadeInUp 0.5s ease-out;
 }
@@ -1015,7 +1001,6 @@ body {
   color: var(--risk-high);
 }
 
-/* ─── Phishing Guide Panel ───────────────────────────── */
 .phishing-guide-panel {
   margin-bottom: 2.5rem;
 }
@@ -1166,7 +1151,6 @@ body {
   margin-bottom: 0.4rem;
 }
 
-/* Theme Toggle Button Styles */
 .theme-toggle {
   position: absolute;
   top: 1.5rem;
@@ -1200,7 +1184,6 @@ body {
   transform: rotate(30deg);
 }
 
-/* Footer styling */
 .app-footer {
   margin-top: auto;
   padding-top: 4rem;
@@ -1209,28 +1192,30 @@ body {
   font-size: 0.85rem;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-main);
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(15, 23, 42, 0.1);
   border-radius: 100px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(15, 23, 42, 0.2);
 }
 
-/* Animations */
 @keyframes fadeInDown {
   from {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1242,6 +1227,7 @@ body {
     opacity: 0;
     transform: translateY(25px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1255,10 +1241,13 @@ body {
 }
 
 @keyframes pulseSlow {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 var(--color-primary-glow);
   }
+
   50% {
     transform: scale(1.05);
     box-shadow: 0 0 20px 5px var(--color-primary-glow);
@@ -1266,9 +1255,17 @@ body {
 }
 
 @keyframes blinkDots {
-  0% { opacity: .2; }
-  20% { opacity: 1; }
-  100% { opacity: .2; }
+  0% {
+    opacity: .2;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: .2;
+  }
 }
 
 @keyframes slideDown {
@@ -1276,6 +1273,7 @@ body {
     opacity: 0;
     max-height: 0;
   }
+
   to {
     opacity: 1;
     max-height: 1200px;
@@ -1283,36 +1281,40 @@ body {
 }
 
 @keyframes pulseBtn {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
-/* ═══════════════════════════════════════════════════════
-   Dark Theme Variables & Component Overrides
-   ═══════════════════════════════════════════════════════ */
 body.dark-theme {
   --bg-main: #000000;
   --bg-card: #0c0c0e;
   --bg-card-hover: #121215;
   --border-glow: rgba(255, 255, 255, 0.1);
   --border-subtle: rgba(255, 255, 255, 0.07);
-  
+
   --text-primary: #f4f4f5;
   --text-secondary: #a1a1aa;
   --text-muted: #52525b;
-  
+
   --color-primary: #ffffff;
   --color-primary-glow: rgba(255, 255, 255, 0.08);
   --color-primary-dark: #e4e4e7;
-  
+
   --risk-high-base: 0, 84%, 60%;
   --risk-medium-base: 38, 92%, 50%;
   --risk-low-base: 142, 72%, 40%;
-  
+
   --risk-high-glow: rgba(239, 68, 68, 0.05);
   --risk-medium-glow: rgba(245, 158, 11, 0.05);
   --risk-low-glow: rgba(16, 185, 129, 0.05);
-  
+
   --glass-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.8);
   --glass-blur: 0px;
 

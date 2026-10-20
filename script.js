@@ -1,12 +1,3 @@
-/**
- * Detector de Phishing Institucional - Javard Corporativo
- * Código JavaScript en nivel Junior: claro, directo y fácil de entender.
- */
-
-// ================================================================
-// 1. LISTA DE EJEMPLOS REALES DE PHISHING (Para pruebas rápidas)
-// ================================================================
-
 const EJEMPLOS = {
   email: [
     {
@@ -82,11 +73,6 @@ const EJEMPLOS = {
   ]
 };
 
-// ================================================================
-// 2. REGLAS Y PALABRAS CLAVE DEL MOTOR HEURÍSTICO
-// ================================================================
-
-// Palabras que usan los atacantes para meter prisa
 const PALABRAS_URGENCIA = [
   "ultimo aviso", "último aviso", "urgente", "aviso urgente", "notificacion final",
   "notificación final", "inmediatamente", "de inmediato", "bloqueo", "bloquear",
@@ -95,7 +81,6 @@ const PALABRAS_URGENCIA = [
   "24 horas", "12 horas", "accion requerida", "acción requerida", "alerta"
 ];
 
-// Palabras que piden contraseñas, validación o datos confidenciales
 const PALABRAS_CREDENCIALES = [
   "validar", "verificar", "contraseña", "password", "iniciar sesion", "iniciar sesión",
   "login", "2auth", "mfa", "actualizar datos", "confirmar cuenta", "restablecer",
@@ -104,7 +89,6 @@ const PALABRAS_CREDENCIALES = [
   "acceso corporativo", "portal de vinculacion", "portal de vinculación"
 ];
 
-// Temas clásicos de engaño (Buzón lleno, Nómina, Paquetería retenida, SAT, etc.)
 const PALABRAS_TEMATICAS_PHISHING = [
   "buzon lleno", "buzón lleno", "capacidad", "correos retenidos", "mensajes retenidos",
   "almacenamiento", "nomina", "nómina", "deposito", "depósito", "sueldo", "salario",
@@ -114,7 +98,6 @@ const PALABRAS_TEMATICAS_PHISHING = [
   "subsidio", "sellos digitales", "comprobante"
 ];
 
-// Amenazas directas de castigo o pérdida
 const PALABRAS_AMENAZAS = [
   "sin tu consentimiento", "sin su consentimiento", "perdera el acceso", "perderá el acceso",
   "sera devuelto", "será devuelto", "quedara retenido", "quedará retenido", "quedará temporalmente retenido",
@@ -122,7 +105,6 @@ const PALABRAS_AMENAZAS = [
   "bloqueado", "suspension inmediata", "suspensión inmediata", "bloqueo preventivo"
 ];
 
-// Palabras sospechosas de captura en enlaces URL
 const PALABRAS_CAPTURA_URL = [
   "login", "auth", "signin", "security", "seguridad", "verificacion", "verificación",
   "verificar", "actualizar", "actualizacion", "actualización", "validar", "password",
@@ -130,12 +112,10 @@ const PALABRAS_CAPTURA_URL = [
   "portal", "cuenta", "nomina", "nómina", "empleados", "formulario", "beneficios"
 ];
 
-// Extensiones de archivos peligrosos en correos
 const EXTENSIONES_PELIGROSAS = [
   ".exe", ".scr", ".bat", ".cmd", ".ps1", ".vbs", ".js", ".zip", ".rar", ".iso", ".dll"
 ];
 
-// Dominios o servicios web gratuitos frecuentemente usados para alojar páginas falsas
 const HOSTINGS_SOSPECHOSOS = [
   "replit.app", "sevalla.page", "versoly.page", "web.core.windows.net",
   "sites.google.com", "zya.me", "iceiy.com", "hstn.me", "000webhostapp.com",
@@ -143,13 +123,11 @@ const HOSTINGS_SOSPECHOSOS = [
   "vercel.app", "netlify.app"
 ];
 
-// Extensiones de dominio (TLDs) de muy bajo costo usadas por atacantes
 const TLDS_SOSPECHOSOS = [
   ".sbs", ".xyz", ".page", ".top", ".buzz", ".icu", ".club", ".site", ".online",
   ".click", ".surf", ".work", ".rest"
 ];
 
-// Marcas o servicios comúnmente suplantados
 const MARCAS_SUPLANTADAS = [
   "microsoft", "office365", "office", "outlook", "onedrive", "sharepoint", "teams",
   "docusign", "paypal", "apple", "google", "dhl", "fedex", "estafeta",
@@ -157,20 +135,14 @@ const MARCAS_SUPLANTADAS = [
   "nomina", "rrhh", "recursos-humanos", "intranet", "universidad"
 ];
 
-// Dominios oficiales o de confianza
 const DOMINIOS_CONFIABLES = [
   ".edu", ".gob", ".gov", ".edu.mx", ".gob.mx", "github.com", "microsoft.com", "google.com"
 ];
 
-// ================================================================
-// 3. VARIABLES GLOBALES DE ESTADO
-// ================================================================
+let pestanaActual = "email";
+let resultadoActual = null;
+let confirmandoLimpieza = false;
 
-let pestanaActual = "email";       // "email" o "url"
-let resultadoActual = null;         // Guarda el último resultado analizado
-let confirmandoLimpieza = false;    // Para el botón de confirmar limpiar historial
-
-// Elementos del DOM
 const botonTema = document.getElementById("theme-toggle");
 const pestanaEmail = document.getElementById("tab-email");
 const pestanaUrl = document.getElementById("tab-url");
@@ -182,12 +154,10 @@ const contenedorEjemplos = document.getElementById("example-tags");
 const formulario = document.getElementById("scanner-form");
 const botonEnviar = document.getElementById("submit-btn");
 
-// Paneles de la derecha
 const panelVacio = document.getElementById("empty-state");
 const panelCarga = document.getElementById("loading-state");
 const panelResultados = document.getElementById("results-container");
 
-// Medidor y Textos de Resultado
 const circuloMedidor = document.getElementById("gauge-fill-circle");
 const puntajeTexto = document.getElementById("gauge-score");
 const insigniaRiesgo = document.getElementById("risk-badge");
@@ -201,12 +171,10 @@ const contenidoTecnico = document.getElementById("tech-details-content");
 const flechaTecnica = document.getElementById("tech-arrow");
 const cuadriculaRecomendaciones = document.getElementById("recommendations-grid");
 
-// Guía Desplegable
 const cabeceraGuia = document.getElementById("guide-header");
 const cuerpoGuia = document.getElementById("guide-body");
 const flechaGuia = document.getElementById("guide-arrow");
 
-// Historial
 const panelHistorial = document.getElementById("history-panel");
 const cabeceraHistorial = document.getElementById("history-header");
 const contadorHistorial = document.getElementById("history-count");
@@ -216,10 +184,6 @@ const resumenHistorial = document.getElementById("history-summary-text");
 const botonLimpiarHistorial = document.getElementById("history-clear-btn");
 const listaHistorial = document.getElementById("history-list");
 
-// ================================================================
-// 4. INICIALIZACIÓN
-// ================================================================
-
 document.addEventListener("DOMContentLoaded", function () {
   iniciarTema();
   mostrarBotonesEjemplos();
@@ -228,37 +192,26 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function asignarEventos() {
-  // Cambio de tema Claro / Oscuro
   botonTema.addEventListener("click", alternarTema);
 
-  // Cambio de pestañas (Correo / URL)
   pestanaEmail.addEventListener("click", function () { cambiarPestana("email"); });
   pestanaUrl.addEventListener("click", function () { cambiarPestana("url"); });
 
-  // Contador de caracteres mientras se escribe
   inputTexto.addEventListener("input", actualizarContador);
 
-  // Envío del formulario
   formulario.addEventListener("submit", procesarEnvio);
 
-  // Desplegables
   cabeceraGuia.addEventListener("click", alternarGuia);
   cabeceraTecnica.addEventListener("click", alternarDetallesTecnicos);
   cabeceraHistorial.addEventListener("click", alternarHistorial);
 
-  // Botón para exportar reporte
   botonExportar.addEventListener("click", exportarReporte);
 
-  // Botón para limpiar historial
   botonLimpiarHistorial.addEventListener("click", function (e) {
     e.stopPropagation();
     limpiarHistorial();
   });
 }
-
-// ================================================================
-// 5. GESTIÓN DEL TEMA (Claro / Oscuro)
-// ================================================================
 
 function iniciarTema() {
   const temaGuardado = localStorage.getItem("tema_preferido");
@@ -279,7 +232,6 @@ function alternarTema() {
 
 function actualizarIconoTema(esOscuro) {
   if (esOscuro) {
-    // Icono de Sol
     botonTema.innerHTML = `
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="4" />
@@ -287,7 +239,6 @@ function actualizarIconoTema(esOscuro) {
       </svg>
     `;
   } else {
-    // Icono de Luna
     botonTema.innerHTML = `
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
@@ -295,10 +246,6 @@ function actualizarIconoTema(esOscuro) {
     `;
   }
 }
-
-// ================================================================
-// 6. CONTROL DE PESTAÑAS Y EJEMPLOS
-// ================================================================
 
 function cambiarPestana(tipo) {
   pestanaActual = tipo;
@@ -358,10 +305,6 @@ function actualizarContador() {
   }
 }
 
-// ================================================================
-// 7. MOTOR DE DETECCIÓN HEURÍSTICO (Lógica clara y directa)
-// ================================================================
-
 function analizarContenido(tipo, texto) {
   const textoMinusculas = texto.toLowerCase();
   let puntaje = 0;
@@ -370,11 +313,6 @@ function analizarContenido(tipo, texto) {
   const recomendaciones = [];
 
   if (tipo === "email") {
-    // -------------------------------------------------------------
-    // ANÁLISIS DE CORREOS ELECTRÓNICOS
-    // -------------------------------------------------------------
-
-    // 1. Revisar si tiene lenguaje de urgencia o prisa
     let tieneUrgencia = false;
     let palabraUrgenciaEncontrada = "";
     for (let i = 0; i < PALABRAS_URGENCIA.length; i++) {
@@ -385,7 +323,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // 2. Revisar si pide contraseñas, validación o datos bancarios
     let pideCredenciales = false;
     let palabraCredencialEncontrada = "";
     for (let i = 0; i < PALABRAS_CREDENCIALES.length; i++) {
@@ -396,7 +333,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // 3. Revisar si usa temas clásicos de phishing (nómina, buzón lleno, aduana, SAT)
     let tieneTemaPhishing = false;
     let temaEncontrado = "";
     for (let i = 0; i < PALABRAS_TEMATICAS_PHISHING.length; i++) {
@@ -407,7 +343,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // 4. Revisar si incluye amenazas directas de consecuencias
     let tieneAmenaza = false;
     let amenazaEncontrada = "";
     for (let i = 0; i < PALABRAS_AMENAZAS.length; i++) {
@@ -418,44 +353,36 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // --- APLICACIÓN DE PUNTAJES SEGÚN SEÑALES DE ALERTA ---
-
-    // A. Urgencia detectada
     if (tieneUrgencia) {
       puntaje += 25;
       amenazas.push(`Uso de tono de urgencia o presión de tiempo: "${palabraUrgenciaEncontrada}"`);
       detallesTecnicos.push(`Presión psicológica: Se detectó sentido de prisa para forzar una acción rápida (+25 pts).`);
     }
 
-    // B. Petición de credenciales
     if (pideCredenciales) {
       puntaje += 30;
       amenazas.push(`Solicitud sospechosa de validación de credenciales/datos: "${palabraCredencialEncontrada}"`);
       detallesTecnicos.push(`Captura de credenciales: Petición de inicio de sesión o verificación de cuenta (+30 pts).`);
     }
 
-    // C. ¡COMBO CRÍTICO! Urgencia + Petición de contraseñas (Patrón inconfundible de phishing)
     if (tieneUrgencia && pideCredenciales) {
       puntaje += 30;
       amenazas.push("Combinación crítica: Presión urgente exigiendo verificar contraseñas o datos de acceso");
       detallesTecnicos.push("Firma de ataque: Coincidencia simultánea de urgencia temporal y captura de identidad (+30 pts).");
     }
 
-    // D. Anzuelos laborales o administrativos (nómina, buzón lleno, paquete aduana, SAT)
     if (tieneTemaPhishing) {
       puntaje += 25;
       amenazas.push(`Pretexto fraudulento institucional detectado: "${temaEncontrado}"`);
       detallesTecnicos.push(`Ingeniería social: Uso de anzuelo administrativo, laboral o económico ("${temaEncontrado}") (+25 pts).`);
     }
 
-    // E. Amenaza de sanciones o bloqueo
     if (tieneAmenaza) {
       puntaje += 20;
       amenazas.push(`Amenaza directa de sanción, bloqueo o pérdida de acceso: "${amenazaEncontrada}"`);
       detallesTecnicos.push(`Manipulación por miedo: Amenaza de desactivación forzada sin consentimiento (+20 pts).`);
     }
 
-    // F. Enlaces hacia servicios gratuitos o sospechosos dentro del correo
     for (let i = 0; i < HOSTINGS_SOSPECHOSOS.length; i++) {
       const host = HOSTINGS_SOSPECHOSOS[i];
       if (textoMinusculas.includes(host)) {
@@ -466,7 +393,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // G. Mención de archivos ejecutables peligrosos
     for (let i = 0; i < EXTENSIONES_PELIGROSAS.length; i++) {
       const ext = EXTENSIONES_PELIGROSAS[i];
       if (textoMinusculas.includes(ext)) {
@@ -477,7 +403,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // H. Cabeceras técnicas de correo (si fueron pegadas)
     if (textoMinusculas.includes("spf: fail") || textoMinusculas.includes("spf: softfail")) {
       puntaje += 25;
       amenazas.push("Fallo de autenticación SPF (remitente no autorizado por el dominio)");
@@ -489,11 +414,9 @@ function analizarContenido(tipo, texto) {
       detallesTecnicos.push("Integridad de mensaje: Firma DKIM no válida (+25 pts).");
     }
 
-    // I. FILTRO DE CORREO LEGÍTIMO INSTITUCIONAL
-    // Si es un aviso oficial de TI sin peticiones de contraseña y desde dominio .edu
     const esAvisoOficial = textoMinusculas.includes("mantenimiento preventivo") &&
-                          textoMinusculas.includes("no se requieren cambios de credenciales") &&
-                          textoMinusculas.includes("soporte-ti@institucion.edu");
+      textoMinusculas.includes("no se requieren cambios de credenciales") &&
+      textoMinusculas.includes("soporte-ti@institucion.edu");
     if (esAvisoOficial) {
       puntaje = 0;
       amenazas.length = 0;
@@ -501,7 +424,6 @@ function analizarContenido(tipo, texto) {
       detallesTecnicos.push("Verificación oficial: Correo firmado por el departamento oficial de TI sin enlaces externos.");
     }
 
-    // Recomendaciones para correos
     if (puntaje >= 70) {
       recomendaciones.push("NO hagas clic en ningún enlace ni introduzcas usuarios o contraseñas.");
       recomendaciones.push("Reporta el correo inmediatamente al área de Seguridad Informática o Soporte TI.");
@@ -516,24 +438,19 @@ function analizarContenido(tipo, texto) {
     }
 
   } else {
-    // -------------------------------------------------------------
-    // ANÁLISIS DE ENLACES URL
-    // -------------------------------------------------------------
     const urlLimpia = textoMinusculas.replace("https://", "").replace("http://", "").split("/")[0];
     const rutaCompleta = textoMinusculas.replace("https://", "").replace("http://", "");
 
-    // 1. Suplantación de marcas o servicios conocidos (Typosquatting)
     let marcaSuplantada = "";
     for (let i = 0; i < MARCAS_SUPLANTADAS.length; i++) {
       const marca = MARCAS_SUPLANTADAS[i];
       if (rutaCompleta.includes(marca)) {
-        // Comprobar si realmente es el sitio oficial legítimo
         const esOficial = (marca === "microsoft" && urlLimpia.endsWith("microsoft.com")) ||
-                          (marca === "google" && urlLimpia.endsWith("google.com")) ||
-                          (marca === "sat" && urlLimpia.endsWith("sat.gob.mx")) ||
-                          (marca === "dhl" && urlLimpia.endsWith("dhl.com")) ||
-                          (marca === "fedex" && urlLimpia.endsWith("fedex.com")) ||
-                          (marca === "bbva" && urlLimpia.endsWith("bbva.mx"));
+          (marca === "google" && urlLimpia.endsWith("google.com")) ||
+          (marca === "sat" && urlLimpia.endsWith("sat.gob.mx")) ||
+          (marca === "dhl" && urlLimpia.endsWith("dhl.com")) ||
+          (marca === "fedex" && urlLimpia.endsWith("fedex.com")) ||
+          (marca === "bbva" && urlLimpia.endsWith("bbva.mx"));
 
         if (!esOficial) {
           marcaSuplantada = marca;
@@ -545,7 +462,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // 2. Alojamiento en hosting gratuito o plataforma pública de desarrollo
     let enHostingGratuito = false;
     for (let i = 0; i < HOSTINGS_SOSPECHOSOS.length; i++) {
       const host = HOSTINGS_SOSPECHOSOS[i];
@@ -558,7 +474,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // 3. Términos de captura de credenciales / login en la URL
     let palabraCapturaEncontrada = "";
     for (let i = 0; i < PALABRAS_CAPTURA_URL.length; i++) {
       const pal = PALABRAS_CAPTURA_URL[i];
@@ -571,21 +486,18 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // 4. ¡COMBO CRÍTICO EN URL! Marca suplantada o hosting gratuito + palabra de login
     if ((marcaSuplantada || enHostingGratuito) && palabraCapturaEncontrada) {
       puntaje += 25;
       amenazas.push("Falso portal de inicio de sesión: Simulación de marca o hosting externo con formulario de credenciales");
       detallesTecnicos.push("Clonación de portal: Combinación directa de marca suplantada y captura de credenciales (+25 pts).");
     }
 
-    // 5. Engaño de dominios gubernamentales o institucionales (ej: sat-gob-mx en .com)
     if (urlLimpia.includes("gob-mx") || urlLimpia.includes("sat-gob") || urlLimpia.includes("universidad-portal") || urlLimpia.includes("intranet-universidad")) {
       puntaje += 45;
       amenazas.push("Falsificación institucional: Simula terminaciones oficiales (.gob.mx / intranet) dentro de un dominio comercial .com");
       detallesTecnicos.push("Camuflaje de dominio: Intento de engañar al usuario simulando extensiones de gobierno o educativas (+45 pts).");
     }
 
-    // 6. Extensión (TLD) de riesgo económico (.xyz, .sbs, .page, etc.)
     for (let i = 0; i < TLDS_SOSPECHOSOS.length; i++) {
       const tld = TLDS_SOSPECHOSOS[i];
       if (urlLimpia.endsWith(tld) || urlLimpia.includes(tld + ".")) {
@@ -596,7 +508,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // 7. Nombre de dominio con múltiples guiones (ej: dhl-mexico-rastreo-paquete)
     const cantidadGuiones = (urlLimpia.split("-").length - 1);
     if (cantidadGuiones >= 2) {
       puntaje += 25;
@@ -604,14 +515,12 @@ function analizarContenido(tipo, texto) {
       detallesTecnicos.push(`Morfología sospechosa: Estructura de nombres compuestos con guiones para confundir la lectura (+25 pts).`);
     }
 
-    // 8. Guiones dobles o exceso de números
     if (urlLimpia.includes("--") || (urlLimpia.match(/[0-9]/g) || []).length >= 4) {
       puntaje += 20;
       amenazas.push("Subdominio autogenerado sospechoso (guiones dobles o secuencias numéricas)");
       detallesTecnicos.push("Sintaxis aleatoria: Patrón numérico o de separación característico de despliegues temporales (+20 pts).");
     }
 
-    // 9. FILTRO DE CONFIANZA PARA ENLACES OFICIALES
     for (let i = 0; i < DOMINIOS_CONFIABLES.length; i++) {
       const seguro = DOMINIOS_CONFIABLES[i];
       if (urlLimpia.endsWith(seguro)) {
@@ -621,7 +530,6 @@ function analizarContenido(tipo, texto) {
       }
     }
 
-    // Recomendaciones para URLs
     if (puntaje >= 70) {
       recomendaciones.push("NO ingreses ningún usuario, contraseña ni datos de tarjeta en esta página.");
       recomendaciones.push("Cierra la pestaña del navegador inmediatamente.");
@@ -635,10 +543,8 @@ function analizarContenido(tipo, texto) {
     }
   }
 
-  // Asegurar que el puntaje esté siempre entre 0 y 100
   puntaje = Math.min(100, Math.max(0, puntaje));
 
-  // Determinar nivel de riesgo
   let nivel = "low";
   if (puntaje >= 70) {
     nivel = "high";
@@ -658,10 +564,6 @@ function analizarContenido(tipo, texto) {
   };
 }
 
-// ================================================================
-// 8. PROCESAR ENVÍO DEL FORMULARIO
-// ================================================================
-
 function procesarEnvio(e) {
   e.preventDefault();
   const contenido = inputTexto.value.trim();
@@ -673,7 +575,6 @@ function procesarEnvio(e) {
   }
   mensajeError.style.display = "none";
 
-  // Mostrar estado de carga animado
   botonEnviar.disabled = true;
   botonEnviar.innerHTML = `
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="animation: rotateRadar 1s linear infinite">
@@ -693,12 +594,10 @@ function procesarEnvio(e) {
   panelResultados.style.display = "none";
   panelCarga.style.display = "flex";
 
-  // Simulamos 1.5 segundos de procesamiento para dar feedback visual
   setTimeout(function () {
     const resultado = analizarContenido(pestanaActual, contenido);
     resultadoActual = resultado;
 
-    // Restaurar botón
     botonEnviar.disabled = false;
     botonEnviar.innerHTML = `
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -713,22 +612,16 @@ function procesarEnvio(e) {
   }, 1500);
 }
 
-// ================================================================
-// 9. MOSTRAR RESULTADOS EN PANTALLA
-// ================================================================
-
 function mostrarResultados(res) {
   panelVacio.style.display = "none";
   panelCarga.style.display = "none";
   panelResultados.style.display = "flex";
 
-  // Animación de entrada
   panelResultados.classList.remove("results-animate-in");
   setTimeout(function () {
     panelResultados.classList.add("results-animate-in");
   }, 50);
 
-  // Calcular medidor circular SVG
   const radio = 42;
   const circunferencia = 2 * Math.PI * radio;
   const desplazamiento = circunferencia - (res.puntaje / 100) * circunferencia;
@@ -737,7 +630,6 @@ function mostrarResultados(res) {
   circuloMedidor.style.strokeDashoffset = desplazamiento;
   puntajeTexto.textContent = res.puntaje;
 
-  // Asignar colores e insignias según el riesgo
   if (res.nivel === "high") {
     circuloMedidor.style.stroke = "var(--risk-high)";
     insigniaRiesgo.className = "risk-level-badge risk-high-style";
@@ -758,7 +650,6 @@ function mostrarResultados(res) {
     descripcionRiesgo.textContent = "No se encontraron firmas maliciosas en el contenido analizado. El remitente o enlace parece legítimo.";
   }
 
-  // Lista de amenazas detectadas
   listaAmenazas.innerHTML = "";
   if (res.amenazas.length > 0) {
     res.amenazas.forEach(function (amenaza) {
@@ -792,7 +683,6 @@ function mostrarResultados(res) {
     listaAmenazas.appendChild(item);
   }
 
-  // Detalles de la consola técnica
   contenidoTecnico.innerHTML = "";
   if (res.detallesTecnicos.length > 0) {
     contenedorTecnico.style.display = "block";
@@ -809,7 +699,6 @@ function mostrarResultados(res) {
     contenedorTecnico.style.display = "none";
   }
 
-  // Recomendaciones
   cuadriculaRecomendaciones.innerHTML = "";
   res.recomendaciones.forEach(function (rec, index) {
     const tarjeta = document.createElement("div");
@@ -821,10 +710,6 @@ function mostrarResultados(res) {
     cuadriculaRecomendaciones.appendChild(tarjeta);
   });
 }
-
-// ================================================================
-// 10. GESTIÓN DEL HISTORIAL (LocalStorage simple)
-// ================================================================
 
 function obtenerHistorial() {
   try {
@@ -847,9 +732,8 @@ function guardarEnHistorial(res) {
     resultadoCompleto: res
   };
 
-  historial.unshift(nuevoElemento); // Insertar al inicio
+  historial.unshift(nuevoElemento);
 
-  // Limitar a máximo 30 registros
   if (historial.length > 30) {
     historial.pop();
   }
@@ -888,7 +772,7 @@ function dibujarHistorialEnDOM(historial) {
       etiqueta = "Sospechoso";
     }
 
-    const iconoTipo = item.tipo === "email" ? "✉ Correo" : "🔗 URL";
+    const iconoTipo = item.tipo === "email" ? "Correo" : "URL";
     const fechaFormateada = formatearFecha(item.fecha);
 
     fila.innerHTML = `
@@ -918,13 +802,11 @@ function dibujarHistorialEnDOM(historial) {
       </div>
     `;
 
-    // Botón para volver a ver el resultado
     fila.querySelector(".history-view-btn").addEventListener("click", function (e) {
       e.stopPropagation();
       mostrarResultados(item.resultadoCompleto);
     });
 
-    // Botón para eliminar un registro
     fila.querySelector(".history-delete-btn").addEventListener("click", function (e) {
       e.stopPropagation();
       eliminarRegistro(item.id);
@@ -958,10 +840,6 @@ function limpiarHistorial() {
   dibujarHistorialEnDOM([]);
 }
 
-// ================================================================
-// 11. DESPLEGABLES (Guía, Técnico, Historial)
-// ================================================================
-
 function alternarGuia() {
   const visible = cuerpoGuia.style.display === "block";
   cuerpoGuia.style.display = visible ? "none" : "block";
@@ -991,10 +869,6 @@ function alternarHistorial() {
     flechaHistorial.classList.remove("open");
   }
 }
-
-// ================================================================
-// 12. EXPORTAR REPORTE A PDF / VENTANA DE IMPRESIÓN
-// ================================================================
 
 function exportarReporte() {
   if (!resultadoActual) return;
@@ -1058,7 +932,7 @@ function exportarReporte() {
     <body>
       <div class="cabecera">
         <div>
-          <h1 style="margin: 0; font-size: 20px;">🛡️ Reporte Técnico de Seguridad</h1>
+          <h1 style="margin: 0; font-size: 20px;">Reporte Técnico de Seguridad</h1>
           <p style="margin: 5px 0 0 0; color: #64748b; font-size: 13px;">Javard Corporativo - Detector de Phishing</p>
         </div>
         <div style="text-align: right; font-size: 13px; color: #64748b;">
@@ -1077,16 +951,16 @@ function exportarReporte() {
       </div>
 
       ${listaAmenazasHtml ? `
-        <h3 style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; font-size: 16px;">⚠️ Amenazas Encontradas</h3>
+        <h3 style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; font-size: 16px;">Amenazas Encontradas</h3>
         <ul style="padding-left: 20px;">${listaAmenazasHtml}</ul>
       ` : ''}
 
       ${listaTecnicaHtml ? `
-        <h3 style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; font-size: 16px; margin-top: 25px;">🔍 Registro de Inspección</h3>
+        <h3 style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; font-size: 16px; margin-top: 25px;">Registro de Inspección</h3>
         <div style="background: #f1f5f9; padding: 12px; border-radius: 6px;">${listaTecnicaHtml}</div>
       ` : ''}
 
-      <h3 style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; font-size: 16px; margin-top: 25px;">✅ Acciones Recomendadas</h3>
+      <h3 style="border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; font-size: 16px; margin-top: 25px;">Acciones Recomendadas</h3>
       ${listaRecomendacionesHtml}
 
       <div class="no-print" style="margin-top: 35px; text-align: center;">
@@ -1099,10 +973,6 @@ function exportarReporte() {
   ventana.document.write(htmlReporte);
   ventana.document.close();
 }
-
-// ================================================================
-// 13. FUNCIONES DE AYUDA (Helpers)
-// ================================================================
 
 function formatearFecha(isoString) {
   try {
