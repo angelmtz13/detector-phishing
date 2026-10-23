@@ -133,6 +133,18 @@ const EJEMPLOS = {
   ]
 };
 
+/* =====================================================================
+   MOTOR DE DETECCIÓN
+   En lugar de buscar frases exactas, el análisis se basa en:
+   - Raíces de palabras (ej. "reactiv" detecta reactivar, reactiva, reactivación)
+   - Normalización de acentos y sustitución de caracteres (0→o, 1→l, 3→e...)
+   - Parseo real de la URL (host, dominio registrable, subdominios, ruta)
+   - Suplantación de marcas comparando contra sus dominios oficiales
+   - Distancia de edición (Levenshtein) para detectar nombres mal escritos
+   - Combinación de señales (varias señales débiles suman una fuerte)
+   ===================================================================== */
+
+// ---------- Raíces de palabras para URLs (se buscan como subcadena) ----------
 const URL_ACCION = [
   "reactiv", "ingres", "confirm", "valid", "verific", "verify", "actualiz", "update",
   "recuper", "recover", "restabl", "restor", "desbloque", "unlock", "desactiv", "renov",
@@ -157,6 +169,7 @@ const URL_TEMA = [
   "clientes", "personas|", "homebanking", "afore", "seguro|"
 ];
 
+// ---------- Raíces de palabras para correos ----------
 const MAIL_URGENCIA = [
   "ultimo aviso", "aviso final", "urgent", "inmediat", "de inmediato", "notificacion final",
   "accion requerida", "accion inmediata", "alerta", "plazo", "expira", "expirar", "vence",
@@ -183,6 +196,7 @@ const MAIL_TEMA = [
   "accesos inusuales", "inactividad", "inusual", "migracion", "nuevos terminos"
 ];
 
+// Señuelos típicos contra comunidades educativas (peso bajo: los avisos reales también los usan)
 const MAIL_TEMA_EDU = [
   "beca", "reinscripcion", "inscripcion", "calificaciones", "kardex", "boleta", "constancia",
   "titulacion", "servicio social", "colegiatura", "adeudo", "cuota", "biblioteca", "licencia",
@@ -304,7 +318,6 @@ const MARCAS = [
 ];
 
 const DOMINIOS_ABUSABLES = ["sharepoint.com", "goo.gl", "googleusercontent.com", "azure.com", "onedrive.com", "t.me"];
-
 const PLATAFORMAS_FORMULARIOS = [
   "docs.google.com/forms", "forms.gle", "forms.office.com", "forms.microsoft.com",
   "sites.google.com", "drive.google.com", "typeform.com", "jotform.com", "forms.app", "tally.so"
@@ -316,6 +329,9 @@ const NOMBRES_TYPO = [
   "banorte", "banamex", "estafeta", "fedex", "icloud", "onedrive", "sharepoint"
 ];
 
+const DOMINIOS_INSTITUCION = [
+];
+
 const DOMINIOS_CONFIABLES = [
   "microsoft.com", "microsoftonline.com", "office.com", "outlook.com", "live.com",
   "google.com", "gmail.com", "github.com", "apple.com", "icloud.com", "docusign.com",
@@ -324,7 +340,7 @@ const DOMINIOS_CONFIABLES = [
   "unam.mx", "ipn.mx", "uam.mx", "tec.mx", "itesm.mx", "tecnm.mx", "udg.mx", "buap.mx",
   "uanl.mx", "uaem.mx", "uaslp.mx", "uv.mx", "unison.mx", "uady.mx", "uabc.mx", "ugto.mx",
   "itam.mx", "ibero.mx", "anahuac.mx", "lasalle.mx", "upn.mx", "colmex.mx", "cinvestav.mx",
-  // Plataformas oficiales
+  // Plataformas educativas oficiales
   "moodle.org", "instructure.com", "canvaslms.com", "blackboard.com", "coursera.org",
   "edx.org", "khanacademy.org", "zoom.us"
 ].concat(DOMINIOS_INSTITUCION);
@@ -617,6 +633,9 @@ function parsearURL(entrada) {
   };
 }
 
+/* ---------------------------------------------------------------------
+   ANÁLISIS DE URL
+   --------------------------------------------------------------------- */
 function analizarURL(texto) {
   const u = parsearURL(texto);
   const amenazas = [];
@@ -638,7 +657,6 @@ function analizarURL(texto) {
   const rutaNorm = normalizarTexto(u.ruta);
   const pajar = hostNorm + " " + hostLeet + " " + rutaNorm;
 
-  // ----- Dominio confiable (se evalúa primero) -----
   const hostRuta = u.host + u.ruta;
   const esFormulario = PLATAFORMAS_FORMULARIOS.some(function (p) { return hostRuta.indexOf(p) === 0; });
   u.formulario = esFormulario;
@@ -670,7 +688,6 @@ function analizarURL(texto) {
     sumar(20, "Formulario o página alojada en una plataforma pública que cualquiera puede crear", "Plataforma abierta: los atacantes también crean formularios en este servicio; verifica quién lo envía");
   }
 
-  // ----- Acortadores -----
   let acortador = false;
   for (let i = 0; i < ACORTADORES.length; i++) {
     if (hostCoincide(u.host, ACORTADORES[i])) {
@@ -680,7 +697,6 @@ function analizarURL(texto) {
     }
   }
 
-  // ----- Hosting gratuito / plataformas públicas -----
   let hostingGratuito = "";
   for (let i = 0; i < HOSTINGS_GRATUITOS.length; i++) {
     if (hostCoincide(u.host, HOSTINGS_GRATUITOS[i])) {
@@ -690,7 +706,6 @@ function analizarURL(texto) {
     }
   }
 
-  // ----- TLD de riesgo -----
   for (let i = 0; i < TLDS_SOSPECHOSOS.length; i++) {
     if (u.host.endsWith(TLDS_SOSPECHOSOS[i])) {
       sumar(30, "Extensión de dominio (TLD) con alto índice de fraude: \"" + TLDS_SOSPECHOSOS[i] + "\"", "Reputación de TLD: extensión de bajo costo frecuentemente abusada");
@@ -707,7 +722,6 @@ function analizarURL(texto) {
     }
   }
 
-  // ----- Suplantación de marca -----
   let marcaSuplantada = "";
   let marcaRutaPendiente = null;
   for (let i = 0; i < MARCAS.length && !marcaSuplantada; i++) {
@@ -730,7 +744,6 @@ function analizarURL(texto) {
     }
   }
 
-  // ----- Typosquatting y sustitución de caracteres -----
   const tokensOrig = hostNorm.split(/[^a-z0-9]+/).filter(function (t) { return t.length >= 4; });
   let typoEncontrado = false;
   for (let i = 0; i < tokensOrig.length && !typoEncontrado; i++) {
@@ -754,7 +767,6 @@ function analizarURL(texto) {
     }
   }
 
-  // ----- Palabras clave (raíces) -----
   const accion = hallar(pajar, URL_ACCION);
   const urgencia = hallar(pajar, URL_URGENCIA);
   const tema = hallar(pajar, URL_TEMA);
@@ -778,8 +790,6 @@ function analizarURL(texto) {
     sumar(15, "Acumulación de palabras clave en un solo dominio (" + totalSenales + " señales)", "Keyword stuffing: dominios legítimos rara vez concatenan tantas palabras sensibles");
   }
 
-  // Una marca que solo aparece en la ruta cuenta únicamente si hay otra señal de fraude
-  // (así un blog que menciona "Galicia" como región no se marca por error)
   const hayOtraSenal = (accionU.length + urgenciaU.length + temaU.length) > 0 ||
     TLDS_SOSPECHOSOS.some(function (t) { return u.host.endsWith(t); }) ||
     TLDS_MODERADOS.some(function (t) { return u.host.endsWith(t); }) || !!hostingGratuito || acortador;
@@ -788,7 +798,6 @@ function analizarURL(texto) {
     sumar(30, "Menciona a \"" + marcaRutaPendiente.nombre + "\" en la ruta de un dominio que no le pertenece (rastro: \"" + marcaRutaPendiente.rastro + "\")", "Marca en la ruta: " + u.registrable + " no es un dominio oficial de " + marcaRutaPendiente.nombre + ", pero su nombre aparece después de la barra");
   }
 
-  // ----- Combinaciones -----
   if ((marcaSuplantada || hostingGratuito || acortador) && accionU.length > 0) {
     sumar(20, "Combinación crítica: infraestructura no oficial + solicitud de acceso/verificación", "Firma de ataque: portal de acceso en servidor ajeno a la organización suplantada");
   }
@@ -797,7 +806,6 @@ function analizarURL(texto) {
     sumar(15, "Combinación de pretexto (" + temaU[0] + ") con solicitud de acceso (" + accionU[0] + ") en un dominio no confiable", "Correlación: tema atractivo + petición de acceso en el mismo dominio");
   }
 
-  // ----- Contexto institucional falso -----
   const institucionales = hallar(hostNorm, PALABRAS_INSTITUCIONALES);
   if (institucionales.length > 0) {
     const esComercial = hostingGratuito || TLDS_COMERCIALES.some(function (t) { return u.host.endsWith(t); });
@@ -809,7 +817,6 @@ function analizarURL(texto) {
     sumar(30, "Simula terminaciones gubernamentales (gob.mx) dentro de otro dominio", "Camuflaje de dominio: imita extensiones de gobierno");
   }
 
-  // ----- Estructura del dominio -----
   const guiones = (u.host.split("-").length - 1);
   if (guiones >= 2) {
     sumar(15, "Dominio atípico con múltiples guiones (" + guiones + ")", "Morfología sospechosa: guiones usados para simular nombres legítimos");
@@ -854,7 +861,6 @@ function analizarURL(texto) {
     sumar(10, "Ruta que apunta a un formulario de acceso: \"" + rutasSens[0] + "\"", "Ruta sensible: la URL lleva a una página de login/verificación en dominio no confiable");
   }
 
-  // ----- Rasgos léxicos adicionales (comunes en URLs de phishing reportadas) -----
   if (u.original.length > 75) {
     sumar(10, "URL muy larga (" + u.original.length + " caracteres)", "Longitud: las URLs de phishing suelen superar 75 caracteres para esconder el dominio real");
   }
@@ -873,9 +879,6 @@ function analizarURL(texto) {
   return { puntaje: Math.min(100, puntaje), amenazas: amenazas, detalles: detalles, url: u, confiable: false, acortador: acortador };
 }
 
-/* ---------------------------------------------------------------------
-   ANÁLISIS DE CORREO
-   --------------------------------------------------------------------- */
 function extraerURLs(texto) {
   const urls = [];
   const conEsquema = texto.match(/\bhttps?:\/*[^\s<>"'«»)]+/gi) || [];
@@ -908,7 +911,6 @@ function analizarCorreo(texto) {
     if (detalle) detalles.push(detalle + " (+" + pts + " pts).");
   }
 
-  // Se eliminan frases negadas ("No se requieren cambios de contraseña...") para no confundirlas con una petición
   let base = normalizarTexto(texto);
   base = base.replace(/\bno\s+(se\s+)?(requier\w+|necesit\w+|solicit\w+|compart\w+|proporcion\w+|ingres\w+|haga\w*|realic\w+)[^.\n]*/g, " ");
 
@@ -944,8 +946,6 @@ function analizarCorreo(texto) {
   if (amenaza.length > 0 && (credenciales.length > 0 || tema.length > 0) && urgencia.length > 0) {
     sumar(10, null, "Patrón completo: urgencia + amenaza + pretexto/credenciales");
   }
-
-  // ----- Extensiones peligrosas -----
   const exts = EXTENSIONES_PELIGROSAS.filter(function (e) {
     return new RegExp("[\\w)]" + e.replace(".", "\\.") + "(\\b|$)", "i").test(texto);
   });
@@ -964,7 +964,6 @@ function analizarCorreo(texto) {
     sumar(20, "Fallo de política DMARC", "Autenticación: el dominio remitente no supera DMARC");
   }
 
-  // ----- Remitente -----
   const remitente = texto.match(/(?:^|\n)\s*(?:de|from|remitente)\s*:[^\n]*?([a-z0-9._+-]+@([a-z0-9.-]+\.[a-z]{2,}))/i);
   if (remitente) {
     const rDom = analizarURL(remitente[2]);
@@ -1004,8 +1003,6 @@ function analizarCorreo(texto) {
     sumar(20, "El mensaje envía a un formulario público (Google Forms, etc.) para pedir datos o actuar con prisa", "Patrón común en phishing escolar: formulario gratuito que parece un trámite oficial");
   }
 
-  // Si todos los enlaces son de dominios oficiales/institucionales y el remitente no es dudoso,
-  // es probable que sea un aviso real (los avisos legítimos también usan palabras como "plazo" o "beca")
   const fallaAutenticacion = /spf\s*[:=]\s*(fail|softfail)|dkim\s*[:=]\s*(fail|none)|dmarc\s*[:=]\s*fail/i.test(texto);
   if (urls.length > 0 && urlsConf === urls.length && puntaje > 0 && !remitenteSospechoso && !fallaAutenticacion) {
     puntaje = Math.round(puntaje * 0.4);
@@ -1021,10 +1018,6 @@ function analizarCorreo(texto) {
   return { puntaje: puntaje, amenazas: amenazas, detalles: detalles };
 }
 
-/* ---------------------------------------------------------------------
-   FUNCIÓN PRINCIPAL
-   --------------------------------------------------------------------- */
-// ¿El texto es una dirección web (con o sin https://)? Un correo "usuario@dominio.com" no cuenta.
 function esSoloURL(t) {
   if (!/^\S+$/.test(t)) return false;
   const tieneEsquema = /^[a-z]+:/i.test(t);
@@ -1039,8 +1032,6 @@ function analizarContenido(tipo, texto) {
   const fichas = texto.trim().split(/\s+/).filter(Boolean);
   let parcial;
   let notaTipo = "";
-
-  // El análisis se elige por lo que realmente se pegó, no solo por la pestaña activa
   if (fichas.length > 0 && (fichas.every(esSoloURL) || (tipo === "url" && fichas.length === 1))) {
     if (tipo === "email") notaTipo = "La entrada es un enlace y no un correo: se analizó como URL.";
     tipo = "url";
@@ -1483,7 +1474,7 @@ function exportarReporte() {
       <div class="cabecera">
         <div>
           <h1 style="margin: 0; font-size: 20px;">Reporte Técnico de Seguridad</h1>
-          <p style="margin: 5px 0 0 0; color: #64748b; font-size: 13px;">Javard Corporativo - Detector de Phishing</p>
+          <p style="margin: 5px 0 0 0; color: #64748b; font-size: 13px;">Detector de Phishing</p>
         </div>
         <div style="text-align: right; font-size: 13px; color: #64748b;">
           <strong>Fecha:</strong> ${fechaHoy}
