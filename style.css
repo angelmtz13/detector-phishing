@@ -1555,7 +1555,6 @@ body,
   grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
 }
 
-/* La animación cortaba el contenido a 1200px */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -1568,7 +1567,6 @@ body,
   }
 }
 
-/* Textos largos / URLs / logs no deben salirse de su caja */
 .threat-text,
 .rec-text,
 .result-desc,
@@ -1589,7 +1587,6 @@ body,
   max-width: 100%;
 }
 
-/* --- Tablet y menor --- */
 @media (max-width: 1023px) {
   .app-container {
     padding: 2rem 1.25rem;
@@ -1606,7 +1603,6 @@ body,
     padding: 1.25rem 0.9rem;
   }
 
-  /* El botón de tema ya no se encima con el título */
   .app-header {
     padding-top: 3rem;
   }
@@ -1639,7 +1635,6 @@ body,
   .text-input {
     height: 120px;
     font-size: 16px;
-    /* evita el zoom automático de iOS al enfocar */
   }
 
   .tab-button {
@@ -1673,7 +1668,6 @@ body,
     font-size: 1.15rem;
   }
 
-  /* Resultado: medidor centrado y texto debajo */
   .result-header-panel {
     gap: 1.25rem;
     justify-items: center;
@@ -1723,7 +1717,6 @@ body,
     font-size: 0.78rem;
   }
 
-  /* Historial */
   .history-actions-bar {
     flex-wrap: wrap;
     gap: 0.6rem;
@@ -1754,7 +1747,6 @@ body,
   }
 }
 
-/* --- Pantallas muy pequeñas (≤ 360px) --- */
 @media (max-width: 360px) {
   .app-title {
     font-size: 1.4rem;
@@ -1773,9 +1765,6 @@ body,
   }
 }
 
-/* --- Pantallas táctiles --- */
-
-/* Botones más fáciles de tocar */
 @media (pointer: coarse) {
 
   .history-view-btn,
@@ -1793,7 +1782,6 @@ body,
   }
 }
 
-/* Sin efectos hover "pegados" en táctil */
 @media (hover: none) {
 
   .example-tag:hover,
@@ -1806,7 +1794,6 @@ body,
   }
 }
 
-/* Respeta usuarios que prefieren menos movimiento */
 @media (prefers-reduced-motion: reduce) {
 
   *,
