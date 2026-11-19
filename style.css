@@ -1514,3 +1514,306 @@ body.dark-theme ::-webkit-scrollbar-thumb {
 body.dark-theme ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* ============================================
+   PARCHE RESPONSIVO - pegar al FINAL del CSS
+   ============================================ */
+
+/* --- Correcciones generales (todos los tamaños) --- */
+
+/* 100vh falla en móviles por la barra del navegador */
+body,
+.app-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Evita que contenido largo (nowrap, código) ensanche el grid */
+.dashboard-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 440px minmax(0, 1fr);
+  }
+}
+
+.left-column,
+.glass-panel,
+.results-container,
+.history-item-left {
+  min-width: 0;
+}
+
+/* Las rejillas con minmax fijo desbordan en pantallas < 330px */
+.guide-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+}
+
+.guide-examples-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+}
+
+/* La animación cortaba el contenido a 1200px */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+
+  to {
+    opacity: 1;
+    max-height: 4000px;
+  }
+}
+
+/* Textos largos / URLs / logs no deben salirse de su caja */
+.threat-text,
+.rec-text,
+.result-desc,
+.guide-card-desc,
+.guide-origin-desc,
+.guide-quote,
+.tech-log-line,
+.tech-details-content {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.tech-details-content {
+  overflow-x: auto;
+}
+
+.text-input {
+  max-width: 100%;
+}
+
+/* --- Tablet y menor --- */
+@media (max-width: 1023px) {
+  .app-container {
+    padding: 2rem 1.25rem;
+  }
+
+  .dashboard-grid {
+    gap: 1.5rem;
+  }
+}
+
+/* --- Móvil --- */
+@media (max-width: 640px) {
+  .app-container {
+    padding: 1.25rem 0.9rem;
+  }
+
+  /* El botón de tema ya no se encima con el título */
+  .app-header {
+    padding-top: 3rem;
+  }
+
+  .theme-toggle {
+    top: 0.9rem;
+    right: 0.9rem;
+    width: 38px;
+    height: 38px;
+  }
+
+  .app-title {
+    font-size: 1.6rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.88rem;
+  }
+
+  .glass-panel {
+    padding: 1.15rem;
+    border-radius: 1rem;
+  }
+
+  .panel-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .text-input {
+    height: 120px;
+    font-size: 16px;
+    /* evita el zoom automático de iOS al enfocar */
+  }
+
+  .tab-button {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.35rem;
+  }
+
+  .example-header-bar {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+  }
+
+  .empty-state,
+  .loading-state {
+    min-height: 280px;
+    padding: 1.5rem 1rem;
+  }
+
+  .empty-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+  }
+
+  .empty-title {
+    font-size: 1.15rem;
+  }
+
+  /* Resultado: medidor centrado y texto debajo */
+  .result-header-panel {
+    gap: 1.25rem;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .result-badge-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .result-status-title {
+    font-size: 1.25rem;
+  }
+
+  .gauge-svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .risk-level-badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .threat-item,
+  .rec-card {
+    padding: 0.85rem;
+    gap: 0.75rem;
+  }
+
+  .threat-item:hover {
+    transform: none;
+  }
+
+  .tech-details-header {
+    padding: 0.85rem 1rem;
+  }
+
+  .tech-details-content {
+    padding: 1rem;
+    font-size: 0.78rem;
+  }
+
+  /* Historial */
+  .history-actions-bar {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .history-item {
+    padding: 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .history-list {
+    max-height: 320px;
+  }
+
+  .guide-origin-card,
+  .guide-intro-card,
+  .guide-card,
+  .guide-pattern-card {
+    padding: 1rem;
+  }
+
+  .guide-quote {
+    font-size: 0.95rem;
+  }
+
+  .app-footer {
+    padding-top: 2.5rem;
+  }
+}
+
+/* --- Pantallas muy pequeñas (≤ 360px) --- */
+@media (max-width: 360px) {
+  .app-title {
+    font-size: 1.4rem;
+  }
+
+  .brand-badge {
+    font-size: 0.7rem;
+  }
+
+  .tab-button {
+    font-size: 0.75rem;
+  }
+
+  .gauge-score {
+    font-size: 1.9rem;
+  }
+}
+
+/* --- Pantallas táctiles --- */
+
+/* Botones más fáciles de tocar */
+@media (pointer: coarse) {
+
+  .history-view-btn,
+  .history-delete-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .example-tag {
+    padding: 0.45rem 0.8rem;
+  }
+
+  .history-clear-btn {
+    padding: 0.5rem 0.85rem;
+  }
+}
+
+/* Sin efectos hover "pegados" en táctil */
+@media (hover: none) {
+
+  .example-tag:hover,
+  .submit-btn:hover:not(:disabled),
+  .export-btn:hover,
+  .guide-card:hover,
+  .threat-item:hover,
+  .theme-toggle:hover {
+    transform: none;
+  }
+}
+
+/* Respeta usuarios que prefieren menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
